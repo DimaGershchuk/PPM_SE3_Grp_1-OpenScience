@@ -1,11 +1,10 @@
 name: Build Branch
 on: 
-push:
-    branches: [ main ]
+  push:
+      branches: [ main ]
   pull_request:
-    branches: [ main ]
-workflow_dispatch:
-
+      branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build_all:
