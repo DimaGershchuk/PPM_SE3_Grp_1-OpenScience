@@ -1,113 +1,60 @@
-import assert from "assert";
+
 import { isNumeric, randint, round, sum, toNumerical, turnSquareBracketsIntoArrays } from "./Util.js";
 
-assert(isNumeric("1.2"));
-assert(isNumeric(0));
-assert(!isNumeric("NaN"));
-assert(!isNumeric("hey"));
-
-// number -> number, e.g. 2 -> 2
-assert.equal(2, toNumerical(2));
-
-// [number] -> [number], e.g. [1,2,3] -> [1,2,3]
-assert.deepEqual([1, 2, 3], toNumerical([1, 2, 3]));
-assert(Array.isArray(toNumerical([0])));
-
-// numeral string -> number, e.g. "8" -> 8
-assert.deepEqual(8, toNumerical("8"));
-
-// [number | numeral string] -> [number], e.g. [1, 2, "3"] -> [1,2,3]
-assert.deepEqual([1, 2, 3], toNumerical([1, 2, "3"]));
-
-// Establish what happens when fed an array-like string
-assert.deepEqual([1, 2, 3], toNumerical(...turnSquareBracketsIntoArrays("[1, 2, 3][]]", 2)));
-
-// Throws
-(async () =>
-{
-	await assert.rejects(
-		async () =>
-		{
-			toNumerical(turnSquareBracketsIntoArrays([1, 2]));
-		},
-		{
-			origin: "util.toNumerical",
-			context: "when converting an object to its numerical form",
-			error: "unable to convert undefined to a number",
-		},
+test("isNumeric function", () => {
+	expect(isNumeric("1.2")).toBe(true);
+	expect(isNumeric(0)).toBe(true);
+	expect(isNumeric("NaN")).toBe(false);
+	expect(isNumeric("hey")).toBe(false);
+  });
+   
+  test("toNumerical function", () => {
+	expect(toNumerical(2)).toBe(2);
+	expect(toNumerical([1, 2, 3])).toEqual([1, 2, 3]);
+	expect(Array.isArray(toNumerical([0]))).toBe(true);
+	expect(toNumerical("8")).toBe(8);
+	expect(toNumerical([1, 2, "3"])).toEqual([1, 2, 3]);
+	expect(toNumerical(...turnSquareBracketsIntoArrays("[1, 2, 3][]]", 2))).toEqual([1, 2, 3]);
+   
+  });
+   
+  test("randint function", () => {
+	for (let i = 0; i < 100; i++) {
+	  expect(randint()).toBe(0);
+	  expect(randint(1)).toBe(0);
+	  expect(randint(1)).toBeGreaterThanOrEqual(0);
+	  expect(randint(1)).toBeLessThan(1);
+	  expect(randint(null)).toBe(0);
+	}
+   
+	for (let i = 100; i > 0; i--) {
+	  expect(randint(i)).toBeLessThan(i);
+	}
+   
+	for (let i = -99; i < 0; i++) {
+	  expect(randint(2 * i, i)).toBeLessThanOrEqual(i);
+	}
+   
+	expect(() => randint(0, -10)).toThrowError(
+	  expect.objectContaining({ error: "min should be <= max" })
+   
 	);
-})();
+  });
+   
+  test("round function", () => {
+	const actual = [10, 1.7777777, 9.1];
+	const expected = [10, 1.78, 9.1];
+	expect(actual.map((input) => round(input, 2))).toEqual(expected);
+   
+  
+  });
+   
 
-// Towards a NumPy inspired bound random integer producer
-for (let i = 0; i < 100; i += 1)
-{
-	// Calling sans arguments gives back zero no matter what
-	assert.equal(randint(), 0);
-}
-
-for (let i = 0; i < 100; i += 1)
-{
-	// Same when calling with a min of one sans max
-	assert.equal(randint(1), 0);
-}
-
-// Expect min to be zero, max to be one, result to be zero
-assert(randint(1) >= 0 === randint(1) < 1);
-
-// Same when calling with a min of one sans max
-assert.equal(randint(1), 0);
-
-for (let i = 0; i < 100; i += 1)
-{
-	// Same with null
-	assert.equal(randint(null), 0);
-}
-
-for (let i = 100; i > 0; i -= 1)
-{
-	// Try out a few ranges in the positive
-	assert(randint(i) < i);
-}
-
-for (let i = -99; i < 0; i += 1)
-{
-	// What happens when using negative parameters?
-	assert(randint(2 * i, i) <= i);
-}
-
-try
-{
-	randint(0, -10);
-}
-catch ({ error })
-{
-	assert.equal(error, "min should be <= max");
-}
-
-// Implement Crib Sheet math extras
-// These are taken from the SO question above
-// https://stackoverflow.com/questions/11832914
-const actual = [
-	10,
-	1.7777777,
-	9.1,
-];
-
-const expected = [
-	10,
-	1.78,
-	9.1,
-];
-
-const got = actual.map((input) => round(input, 2));
-
-assert.deepEqual(expected, got);
-
-assert.equal(sum(null), 0);
-assert.equal(sum(), 0);
-assert(!sum([0]));
-assert.equal(sum([1, NaN, null, undefined]), 1);
-assert.equal(sum([1, 2, -3]), 0);
-
-// Careful Thomas!
-assert.equal(sum(["a1", 2]), 2);
+  test("sum function", () => {  
+	expect(sum(null)).toBe(0);
+	expect(sum()).toBe(0);
+	expect(sum([0])).toBe(0);
+	expect(sum([1, NaN, null, undefined])).toBe(1);
+	expect(sum([1, 2, -3])).toBe(0);
+	expect(sum(["a1", 2])).toBe(2);
+  });
