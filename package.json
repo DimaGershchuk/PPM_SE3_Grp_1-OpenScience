@@ -24,7 +24,6 @@
     "lint:css": "csslint src",
     "lint:js": "eslint src",
     "lint:scripts": "eslint scripts --ext .cjs",
-    "test": "jest",
     "start": "npm run build"
   },
   "dependencies": {
