@@ -1,8 +1,8 @@
 // EventEmitter.test.js
 import { EventEmitter } from "../src/EventEmitter.js";
 
-// Мокаємо util.makeUuid для повернення послідовних ідентифікаторів
-jest.mock("../src/Util.js", () => {
+
+jest.mock("../src/util/Util.js", () => {
   let counter = 0;
   return {
     makeUuid: () => `uuid-${++counter}`
