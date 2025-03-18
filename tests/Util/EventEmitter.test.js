@@ -1,5 +1,5 @@
 // EventEmitter.test.js
-import { EventEmitter } from "../src/EventEmitter.js";
+import { EventEmitter } from "../../src/util/EventEmitter.js";
 
 
 jest.mock("../../src/util/Util.js", () => {
