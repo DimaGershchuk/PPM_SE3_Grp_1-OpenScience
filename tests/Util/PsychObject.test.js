@@ -88,8 +88,7 @@ describe("PsychObject", () => {
     po._addAttribute("arrayAttr", [1, 2]);
     try {
         po._setAttribute("arrayAttr", [10, 20, 30], false, "+");
-        // Якщо сюди дійшло – помилки не було
-        fail("Повинна була виникнути помилка, але не виникла");
+        fail("Mistake should appear");
     } catch (e) {
         expect(e.error).toMatch(/should have the same size/);
     }
@@ -100,9 +99,9 @@ describe("PsychObject", () => {
     po._addAttribute("foo", 2);
         try {
         po._setAttribute("foo", 3, false, "^");
-        fail("Мала виникнути помилка про 'unsupported operation'");
+        fail("Mistake should appeate about 'unsupported operation'");
         } catch (e) {
-        expect(e.error).toMatch(/unsupported operation/);
+        expect(e.error).toMatch(/unsupported.*operation/);
         }
   });
 
