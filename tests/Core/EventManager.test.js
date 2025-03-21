@@ -1,4 +1,4 @@
-import { EventManager } from '../../src/EventManager.js';
+import { EventManager } from '../../src/core/EventManager.js';
 import { MonotonicClock } from '../../src/util/Clock.js';
 
 class MockPsychoJS {
