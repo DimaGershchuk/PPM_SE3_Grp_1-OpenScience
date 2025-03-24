@@ -186,16 +186,21 @@ export class Scheduler
 	 */
 	async _runNextTasks()
 	{
-		this._status = Scheduler.Status.RUNNING;
+	
 
 		let state = Scheduler.Event.NEXT;
-		while (state === Scheduler.Event.NEXT)
+		while (state === Scheduler.Event.NEXT || state === Scheduler.Event.FLIP_REPEAT || state === Scheduler.Event.FLIP_NEXT)
 		{
 			// check if we need to quit:
 			if (this._stopAtNextTask)
 			{
-				return Scheduler.Event.QUIT;
-			}
+				return Scheduler.Event.QUIT
+			}	
+
+			if (this._status !== Scheduler.Status.STOPPED) {
+				this._status = Scheduler.Status.RUNNING;
+			};
+			
 
 			// if there is no current task, we look for the next one in the list or quit if there is none:
 			if (typeof this._currentTask == "undefined")
@@ -220,7 +225,7 @@ export class Scheduler
 			}
 
 			// if the current task is a function, we run it:
-			if (this._currentTask instanceof Function)
+			if (typeof this._currentTask === "function")
 			{
 				state = await this._currentTask(...this._currentArgs);
 			}
@@ -232,6 +237,7 @@ export class Scheduler
 				state = await this._currentTask._runNextTasks();
 				if (state === Scheduler.Event.QUIT)
 				{
+					this._status = Scheduler.Status.STOPPED;
 					// if the experiment has not ended, we move onto the next task:
 					if (!this._psychoJS.experiment.experimentEnded)
 					{
