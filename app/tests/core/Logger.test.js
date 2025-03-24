@@ -3,6 +3,15 @@ import { PsychoJS } from '../../src/core/PsychoJS.js';
 import { MonotonicClock } from '../../src/util/Clock.js';
 import log4javascript from 'log4javascript';
 
+// Mock createjs before tests
+global.createjs = {
+    LoadQueue: jest.fn().mockImplementation(() => ({
+        addEventListener: jest.fn(),
+        loadFile: jest.fn(),
+        load: jest.fn()
+    }))
+};
+
 describe('Logger', () => {
     let psychoJS;
     let logger;
