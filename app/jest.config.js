@@ -6,6 +6,7 @@ module.exports = {
         // Mock core dependencies
         '^../../src/core/ServerManager.js$': '<rootDir>/tests/__mocks__/ServerManager.js',
         '^../../src/core/PsychoJS.js$': '<rootDir>/tests/__mocks__/PsychoJS.js',
+        '^../../src/core/EventManager.js$': '<rootDir>/tests/__mocks__/EventManager.js',
         // Mock graphics-related imports
         '^pixi.js-legacy$': '<rootDir>/tests/__mocks__/pixiMock.js',
         '^@pixi/(.*)$': '<rootDir>/tests/__mocks__/pixiMock.js',
