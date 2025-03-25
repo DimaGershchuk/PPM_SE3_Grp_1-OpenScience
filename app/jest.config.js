@@ -3,13 +3,10 @@ module.exports = {
     testEnvironment: 'node',
     moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/$1',
-        // Mock core dependencies - handle both relative and absolute paths
-        '\\./EventManager\\.js$': '<rootDir>/tests/__mocks__/EventManager.js',
-        '\\./ServerManager\\.js$': '<rootDir>/tests/__mocks__/ServerManager.js',
-        '\\./PsychoJS\\.js$': '<rootDir>/tests/__mocks__/PsychoJS.js',
-        '\\.\\./\\.\\./src/core/EventManager\\.js$': '<rootDir>/tests/__mocks__/EventManager.js',
-        '\\.\\./\\.\\./src/core/ServerManager\\.js$': '<rootDir>/tests/__mocks__/ServerManager.js',
-        '\\.\\./\\.\\./src/core/PsychoJS\\.js$': '<rootDir>/tests/__mocks__/PsychoJS.js',
+        // Mock core dependencies - using proper relative path matching
+        '\\.\\./(.*)/src/core/ServerManager\\.js$': '<rootDir>/tests/__mocks__/ServerManager.js',
+        '\\.\\./(.*)/src/core/PsychoJS\\.js$': '<rootDir>/tests/__mocks__/PsychoJS.js',
+        '\\.\\./(.*)/src/core/EventManager\\.js$': '<rootDir>/tests/__mocks__/EventManager.js',
         // Mock graphics-related imports
         '^pixi\\.js-legacy$': '<rootDir>/tests/__mocks__/pixiMock.js',
         '^pixi\\.js$': '<rootDir>/tests/__mocks__/pixiMock.js',
