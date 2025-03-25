@@ -55,13 +55,11 @@ console.error = (...args) => {
     originalConsoleError(...args);
 };
 
-// Set up minimal test environment
+// Set up minimal test environment for backend tests
 const setupTestEnvironment = () => {
-    // Set up only essential globals needed for backend tests
     global.window = {
         addEventListener: jest.fn()
     };
 };
 
-// Initialize the test environment
 setupTestEnvironment(); 
