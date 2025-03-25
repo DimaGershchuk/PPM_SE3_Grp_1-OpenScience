@@ -8,7 +8,9 @@ module.exports = {
         '^../../src/core/PsychoJS.js$': '<rootDir>/tests/__mocks__/PsychoJS.js',
         '^../../src/core/EventManager.js$': '<rootDir>/tests/__mocks__/EventManager.js',
         // Mock graphics-related imports
-        '^pixi.js-legacy$': '<rootDir>/tests/__mocks__/pixiMock.js',
+        '^pixi\\.js-legacy$': '<rootDir>/tests/__mocks__/pixiMock.js',
+        '^pixi\\.js$': '<rootDir>/tests/__mocks__/pixiMock.js',
+        '^@pixi/filter-adjustment$': '<rootDir>/tests/__mocks__/pixiMock.js',
         '^@pixi/(.*)$': '<rootDir>/tests/__mocks__/pixiMock.js',
         'tone': '<rootDir>/tests/__mocks__/toneMock.js'
     },
