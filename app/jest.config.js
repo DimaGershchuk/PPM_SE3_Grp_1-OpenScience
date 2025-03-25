@@ -20,8 +20,7 @@ module.exports = {
         '<rootDir>/tests/Util/Scheduler.test.js',
         '<rootDir>/tests/Util/PsychObject.test.js',
         '<rootDir>/tests/Util/EventEmitter.test.js',
-        '<rootDir>/tests/core/EventManager.test.js',
-        '<rootDir>/tests/sample.test.js'
+        '<rootDir>/tests/core/EventManager.test.js'
     ],
     // Explicitly ignore problematic tests
     testPathIgnorePatterns: [
