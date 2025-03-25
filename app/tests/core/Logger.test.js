@@ -3,6 +3,21 @@ import { PsychoJS } from '../../src/core/PsychoJS.js';
 import { MonotonicClock } from '../../src/util/Clock.js';
 import log4javascript from 'log4javascript';
 
+// Mock ServerManager module
+jest.mock('../../src/core/ServerManager.js', () => {
+    return {
+        ServerManager: jest.fn().mockImplementation(() => ({
+            _setupPreloadQueue: jest.fn(),
+            _psychoJS: {},
+            _preloadQueue: {
+                addEventListener: jest.fn(),
+                loadFile: jest.fn(),
+                load: jest.fn()
+            }
+        }))
+    };
+});
+
 describe('Logger', () => {
     let psychoJS;
     let logger;
@@ -23,6 +38,15 @@ describe('Logger', () => {
             if (id === 'root') return rootElement;
             return null;
         });
+
+        // Mock createjs globally
+        global.createjs = {
+            LoadQueue: jest.fn().mockImplementation(() => ({
+                addEventListener: jest.fn(),
+                loadFile: jest.fn(),
+                load: jest.fn()
+            }))
+        };
     });
 
     beforeEach(() => {
