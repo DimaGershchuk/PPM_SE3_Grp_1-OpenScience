@@ -1,3 +1,12 @@
+// Mock createjs at the global level
+global.createjs = {
+    LoadQueue: jest.fn().mockImplementation(() => ({
+        addEventListener: jest.fn(),
+        loadFile: jest.fn(),
+        load: jest.fn()
+    }))
+};
+
 // Set up minimal test environment
 const setupTestEnvironment = () => {
     // Set up global objects

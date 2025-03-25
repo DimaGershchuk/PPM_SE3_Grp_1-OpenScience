@@ -2,10 +2,11 @@ import { Logger } from '../../src/core/Logger.js';
 import { MonotonicClock } from '../../src/util/Clock.js';
 import log4javascript from 'log4javascript';
 
-// Mock ServerManager module
+// Mock ServerManager before other imports
 jest.mock('../../src/core/ServerManager.js', () => {
     return {
         ServerManager: jest.fn().mockImplementation(() => ({
+            on: jest.fn(),
             _setupPreloadQueue: jest.fn(),
             _psychoJS: {},
             _preloadQueue: {
@@ -13,6 +14,20 @@ jest.mock('../../src/core/ServerManager.js', () => {
                 loadFile: jest.fn(),
                 load: jest.fn()
             }
+        })),
+        Event: {
+            RESOURCE: 'RESOURCE',
+            LOG: 'LOG',
+            ERROR: 'ERROR'
+        }
+    };
+});
+
+// Mock GUI
+jest.mock('../../src/core/GUI.js', () => {
+    return {
+        GUI: jest.fn().mockImplementation(() => ({
+            _onResourceEvents: jest.fn()
         }))
     };
 });
@@ -22,34 +37,8 @@ describe('Logger', () => {
     let logger;
     const threshold = log4javascript.Level.ERROR;
 
-    beforeAll(() => {
-        // Set up DOM mocking
-        const rootElement = {
-            classList: {
-                add: jest.fn(),
-                remove: jest.fn(),
-                contains: jest.fn()
-            }
-        };
-
-        // Mock document methods
-        document.getElementById = jest.fn((id) => {
-            if (id === 'root') return rootElement;
-            return null;
-        });
-
-        // Mock createjs globally
-        global.createjs = {
-            LoadQueue: jest.fn().mockImplementation(() => ({
-                addEventListener: jest.fn(),
-                loadFile: jest.fn(),
-                load: jest.fn()
-            }))
-        };
-    });
-
     beforeEach(() => {
-        // Create a minimal mock PsychoJS instance with only what Logger needs
+        // Create a Logger instance for testing
         psychoJS = {
             debug: true,
             getEnvironment: jest.fn().mockReturnValue('SERVER'),
@@ -58,10 +47,11 @@ describe('Logger', () => {
                     status: 'RUNNING',
                     fullpath: 'test/path'
                 }
+            },
+            serverManager: {
+                on: jest.fn()
             }
         };
-        
-        // Create a Logger instance for testing
         logger = new Logger(psychoJS, threshold);
     });
 
