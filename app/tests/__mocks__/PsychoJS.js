@@ -1,25 +1,33 @@
-import { ServerManager } from './ServerManager';
+const ServerManager = require('./ServerManager');
 
-export class PsychoJS {
-    constructor(params = {}) {
-        this.debug = params.debug || false;
-        this.serverManager = new ServerManager();
+class PsychoJS {
+    constructor({
+        debug = false,
+        collectIP = false,
+        hosts = [],
+    } = {}) {
+        this._debug = debug;
+        this._hosts = hosts;
+        this._collectIP = collectIP;
+        
+        // Create the server manager without relying on createjs
+        this._serverManager = new ServerManager(this);
+        
+        // Add other commonly used properties
+        this.status = 'INITIALIZED';
+        this.config = {};
         this.window = null;
-        this.gui = null;
-        this.config = {
-            experiment: {
-                name: 'testExp',
-                status: 'RUNNING',
-                fullpath: 'test/path'
-            }
-        };
+        this.logger = null;
     }
 
-    getEnvironment = jest.fn().mockReturnValue('TEST');
-    experimentLogger = {
-        debug: jest.fn(),
-        info: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn()
-    };
-} 
+    // Add any methods that Logger.test.js might need
+    getEnvironment() {
+        return 'TEST';
+    }
+
+    experimentEnded() {
+        return false;
+    }
+}
+
+module.exports = PsychoJS; 
