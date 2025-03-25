@@ -1,5 +1,4 @@
 import { Logger } from '../../src/core/Logger.js';
-import { PsychoJS } from '../../src/core/PsychoJS.js';
 import { MonotonicClock } from '../../src/util/Clock.js';
 import log4javascript from 'log4javascript';
 
@@ -50,10 +49,17 @@ describe('Logger', () => {
     });
 
     beforeEach(() => {
-        // Create a mock PsychoJS instance
-        psychoJS = new PsychoJS({
-            debug: true
-        });
+        // Create a minimal mock PsychoJS instance with only what Logger needs
+        psychoJS = {
+            debug: true,
+            getEnvironment: jest.fn().mockReturnValue('SERVER'),
+            config: {
+                experiment: {
+                    status: 'RUNNING',
+                    fullpath: 'test/path'
+                }
+            }
+        };
         
         // Create a Logger instance for testing
         logger = new Logger(psychoJS, threshold);
