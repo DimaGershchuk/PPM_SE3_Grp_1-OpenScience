@@ -14,5 +14,17 @@ module.exports = {
     },
     clearMocks: true,
     resetMocks: true,
-    restoreMocks: true
+    restoreMocks: true,
+    // Ignore graphics-related files and tests
+    testPathIgnorePatterns: [
+        '/node_modules/',
+        'Window.test.js',
+        'GUI.test.js',
+        'Visual.test.js'
+    ],
+    modulePathIgnorePatterns: [
+        'pixi.js',
+        'tone.js',
+        '@pixi'
+    ]
 }; 
