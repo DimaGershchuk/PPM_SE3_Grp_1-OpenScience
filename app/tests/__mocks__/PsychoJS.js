@@ -9,11 +9,9 @@ class PsychoJS {
         this._debug = debug;
         this._hosts = hosts;
         this._collectIP = collectIP;
-        
-        // Create the server manager without relying on createjs
         this._serverManager = new ServerManager(this);
+        this._serverMsg = [];
         
-        // Add other commonly used properties
         this.status = 'INITIALIZED';
         this.config = {
             experiment: {
@@ -22,12 +20,12 @@ class PsychoJS {
                 status: 'RUNNING'
             }
         };
-        this.window = null;
-        this.logger = null;
-        this._serverMsg = [];
     }
 
-    // Add any methods that Logger.test.js might need
+    get serverManager() {
+        return this._serverManager;
+    }
+
     getEnvironment() {
         return 'TEST';
     }
@@ -36,31 +34,34 @@ class PsychoJS {
         return false;
     }
 
-    // Add getter for serverManager
-    get serverManager() {
-        return this._serverManager;
-    }
-
-    // Add logging methods that might be needed
     log(msg) {
-        this._serverMsg.push(msg);
+        this._serverMsg.push({ level: 'INFO', msg });
+        this._serverManager.log({ level: 'INFO', msg });
         return this;
     }
 
     debug(msg) {
-        return this.log(msg);
+        this._serverMsg.push({ level: 'DEBUG', msg });
+        this._serverManager.debug(msg);
+        return this;
     }
 
     info(msg) {
-        return this.log(msg);
+        this._serverMsg.push({ level: 'INFO', msg });
+        this._serverManager.info(msg);
+        return this;
     }
 
     warn(msg) {
-        return this.log(msg);
+        this._serverMsg.push({ level: 'WARNING', msg });
+        this._serverManager.warn(msg);
+        return this;
     }
 
     error(msg) {
-        return this.log(msg);
+        this._serverMsg.push({ level: 'ERROR', msg });
+        this._serverManager.error(msg);
+        return this;
     }
 }
 

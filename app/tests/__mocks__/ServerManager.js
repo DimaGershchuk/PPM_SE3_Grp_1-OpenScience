@@ -2,6 +2,7 @@
 class ServerManager {
     constructor(psychoJS) {
         this._psychoJS = psychoJS;
+        this._eventCallbacks = new Map();
         this._setupPreloadQueue();
     }
 
@@ -24,41 +25,48 @@ class ServerManager {
 
     // Add event emitter methods
     on(event, callback) {
-        // Mock event subscription
+        if (!this._eventCallbacks.has(event)) {
+            this._eventCallbacks.set(event, []);
+        }
+        this._eventCallbacks.get(event).push(callback);
         return this;
     }
 
     emit(event, data) {
-        // Mock event emission
+        if (this._eventCallbacks.has(event)) {
+            this._eventCallbacks.get(event).forEach(callback => callback(data));
+        }
         return this;
     }
 
     // Add logging methods
     log(msg) {
+        this.emit(ServerManager.Event.LOG, msg);
         return this;
     }
 
     debug(msg) {
-        return this;
+        return this.log({ level: 'DEBUG', msg });
     }
 
     info(msg) {
-        return this;
+        return this.log({ level: 'INFO', msg });
     }
 
     warn(msg) {
-        return this;
+        return this.log({ level: 'WARNING', msg });
     }
 
     error(msg) {
-        return this;
+        return this.log({ level: 'ERROR', msg });
     }
 }
 
 // Export both the class and Event constants
-module.exports = ServerManager;
-module.exports.Event = {
+ServerManager.Event = {
     RESOURCE: 'RESOURCE',
     LOG: 'LOG',
     ERROR: 'ERROR'
-}; 
+};
+
+module.exports = ServerManager; 
