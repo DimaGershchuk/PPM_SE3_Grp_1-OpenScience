@@ -14,6 +14,17 @@ global.WebGL2RenderingContext = jest.fn();
 // Mock window properties that PIXI.js needs
 global.window = global;
 global.window.addEventListener = jest.fn();
+
+// Create a mock root element with classList functionality
+const rootElement = {
+    classList: {
+        add: jest.fn(),
+        remove: jest.fn(),
+        contains: jest.fn()
+    }
+};
+
+// Mock document with getElementById returning our mock root element
 global.document = {
     createElement: jest.fn(() => ({
         getContext: jest.fn(() => ({
@@ -22,7 +33,11 @@ global.document = {
             getSupportedExtensions: jest.fn(() => [])
         }))
     })),
-    addEventListener: jest.fn()
+    addEventListener: jest.fn(),
+    getElementById: jest.fn((id) => {
+        if (id === 'root') return rootElement;
+        return null;
+    })
 };
 
 // Suppress specific console messages
