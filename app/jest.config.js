@@ -4,9 +4,9 @@ module.exports = {
     moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/$1',
         // Mock core dependencies - using proper relative path matching
-        '\\.\\./(.*)/src/core/ServerManager\\.js$': '<rootDir>/tests/__mocks__/ServerManager.js',
-        '\\.\\./(.*)/src/core/PsychoJS\\.js$': '<rootDir>/tests/__mocks__/PsychoJS.js',
-        '\\.\\./(.*)/src/core/EventManager\\.js$': '<rootDir>/tests/__mocks__/EventManager.js',
+        '\\.\\./\\.\\./src/core/ServerManager\\.js$': '<rootDir>/tests/__mocks__/ServerManager.js',
+        '\\.\\./\\.\\./src/core/PsychoJS\\.js$': '<rootDir>/tests/__mocks__/PsychoJS.js',
+        '\\.\\./\\.\\./src/core/EventManager\\.js$': '<rootDir>/tests/__mocks__/EventManager.js',
         // Mock graphics-related imports
         '^pixi\\.js-legacy$': '<rootDir>/tests/__mocks__/pixiMock.js',
         '^pixi\\.js$': '<rootDir>/tests/__mocks__/pixiMock.js',
@@ -20,8 +20,6 @@ module.exports = {
         '<rootDir>/tests/Util/Scheduler.test.js',
         '<rootDir>/tests/Util/PsychObject.test.js',
         '<rootDir>/tests/core/EventManager.test.js',
-        '<rootDir>/app/tests/Util/PsychObject.test.js',
-        '<rootDir>/app/tests/sample.test.js',
         '<rootDir>/tests/sample.test.js'
     ],
     transform: {
@@ -32,5 +30,6 @@ module.exports = {
     restoreMocks: true,
     modulePathIgnorePatterns: [
         'node_modules'
-    ]
+    ],
+    rootDir: '.'
 }; 
