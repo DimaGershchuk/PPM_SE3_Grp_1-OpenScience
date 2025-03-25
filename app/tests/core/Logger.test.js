@@ -3,19 +3,27 @@ import { PsychoJS } from '../../src/core/PsychoJS.js';
 import { MonotonicClock } from '../../src/util/Clock.js';
 import log4javascript from 'log4javascript';
 
-// Mock createjs before tests
-global.createjs = {
-    LoadQueue: jest.fn().mockImplementation(() => ({
-        addEventListener: jest.fn(),
-        loadFile: jest.fn(),
-        load: jest.fn()
-    }))
-};
-
 describe('Logger', () => {
     let psychoJS;
     let logger;
     const threshold = log4javascript.Level.ERROR;
+
+    beforeAll(() => {
+        // Set up DOM mocking
+        const rootElement = {
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn()
+            }
+        };
+
+        // Mock document methods
+        document.getElementById = jest.fn((id) => {
+            if (id === 'root') return rootElement;
+            return null;
+        });
+    });
 
     beforeEach(() => {
         // Create a mock PsychoJS instance
@@ -30,6 +38,7 @@ describe('Logger', () => {
     afterEach(() => {
         // Clean up
         logger = null;
+        jest.clearAllMocks();
     });
 
     describe('constructor', () => {
