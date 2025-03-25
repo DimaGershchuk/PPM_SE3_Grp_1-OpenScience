@@ -15,9 +15,16 @@ class PsychoJS {
         
         // Add other commonly used properties
         this.status = 'INITIALIZED';
-        this.config = {};
+        this.config = {
+            experiment: {
+                name: 'testExp',
+                fullpath: '/tests/testExp',
+                status: 'RUNNING'
+            }
+        };
         this.window = null;
         this.logger = null;
+        this._serverMsg = [];
     }
 
     // Add any methods that Logger.test.js might need
@@ -27,6 +34,33 @@ class PsychoJS {
 
     experimentEnded() {
         return false;
+    }
+
+    // Add getter for serverManager
+    get serverManager() {
+        return this._serverManager;
+    }
+
+    // Add logging methods that might be needed
+    log(msg) {
+        this._serverMsg.push(msg);
+        return this;
+    }
+
+    debug(msg) {
+        return this.log(msg);
+    }
+
+    info(msg) {
+        return this.log(msg);
+    }
+
+    warn(msg) {
+        return this.log(msg);
+    }
+
+    error(msg) {
+        return this.log(msg);
     }
 }
 

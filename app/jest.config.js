@@ -30,10 +30,16 @@ module.exports = {
     moduleNameMapper: {
         '\\.(css|less|sass|scss)$': '<rootDir>/tests/__mocks__/styleMock.js',
         '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/tests/__mocks__/fileMock.js',
-        '^../src/core/ServerManager.js$': '<rootDir>/tests/__mocks__/ServerManager.js',
-        '^../src/core/PsychoJS.js$': '<rootDir>/tests/__mocks__/PsychoJS.js',
-        '^../../src/core/ServerManager.js$': '<rootDir>/tests/__mocks__/ServerManager.js',
-        '^../../src/core/PsychoJS.js$': '<rootDir>/tests/__mocks__/PsychoJS.js'
+        'src/core/ServerManager.js': '<rootDir>/tests/__mocks__/ServerManager.js',
+        'src/core/PsychoJS.js': '<rootDir>/tests/__mocks__/PsychoJS.js',
+        '../src/core/ServerManager.js': '<rootDir>/tests/__mocks__/ServerManager.js',
+        '../src/core/PsychoJS.js': '<rootDir>/tests/__mocks__/PsychoJS.js',
+        '../../src/core/ServerManager.js': '<rootDir>/tests/__mocks__/ServerManager.js',
+        '../../src/core/PsychoJS.js': '<rootDir>/tests/__mocks__/PsychoJS.js',
+        '<rootDir>/src/core/ServerManager.js': '<rootDir>/tests/__mocks__/ServerManager.js',
+        '<rootDir>/src/core/PsychoJS.js': '<rootDir>/tests/__mocks__/PsychoJS.js',
+        'app/src/core/ServerManager.js': '<rootDir>/tests/__mocks__/ServerManager.js',
+        'app/src/core/PsychoJS.js': '<rootDir>/tests/__mocks__/PsychoJS.js'
     },
     clearMocks: true,
     resetMocks: true,
