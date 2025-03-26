@@ -1,6 +1,6 @@
 module.exports = {
     setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
-    testEnvironment: 'node',
+    testEnvironment: 'jsdom',
     transform: {
         '^.+\\.js$': 'babel-jest',
     },
@@ -29,5 +29,9 @@ module.exports = {
     resetMocks: true,
     restoreMocks: true,
     rootDir: '.',
-    verbose: true
+    verbose: true,
+    setupFiles: [
+        'jest-canvas-mock',
+        '<rootDir>/tests/setup.js'
+    ]
 }; 
