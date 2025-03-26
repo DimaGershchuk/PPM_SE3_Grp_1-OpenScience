@@ -22,11 +22,12 @@ module.exports = {
     ],
     moduleNameMapper: {
         // Map core backend dependencies to mocks
-        '.*ServerManager.js$': '<rootDir>/tests/__mocks__/ServerManager.js',
-        '.*PsychoJS.js$': '<rootDir>/tests/__mocks__/PsychoJS.js'
+        '.*[/\\\\]src[/\\\\]core[/\\\\]ServerManager\\.js$': '<rootDir>/tests/__mocks__/ServerManager.js',
+        '.*[/\\\\]src[/\\\\]core[/\\\\]PsychoJS\\.js$': '<rootDir>/tests/__mocks__/PsychoJS.js'
     },
     clearMocks: true,
     resetMocks: true,
     restoreMocks: true,
-    rootDir: '.'
+    rootDir: '.',
+    verbose: true
 }; 

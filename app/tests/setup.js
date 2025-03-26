@@ -7,6 +7,23 @@ global.createjs = {
     }))
 };
 
+// Set up minimal test environment
+global.window = {
+    addEventListener: jest.fn()
+};
+
+// Suppress console warnings
+const originalConsoleError = console.error;
+console.error = (...args) => {
+    if (typeof args[0] === 'string' && (
+        args[0].includes('WebGL not available') ||
+        args[0].includes('Tone.js')
+    )) {
+        return;
+    }
+    originalConsoleError(...args);
+};
+
 // Mock window and document
 global.window = {
     addEventListener: jest.fn(),
@@ -41,18 +58,6 @@ global.WebGLRenderingContext = {
     ARRAY_BUFFER: 'ARRAY_BUFFER',
     ELEMENT_ARRAY_BUFFER: 'ELEMENT_ARRAY_BUFFER',
     STATIC_DRAW: 'STATIC_DRAW'
-};
-
-// Suppress console warnings we can't fix
-const originalConsoleError = console.error;
-console.error = (...args) => {
-    if (typeof args[0] === 'string' && (
-        args[0].includes('WebGL not available') ||
-        args[0].includes('Tone.js')
-    )) {
-        return;
-    }
-    originalConsoleError(...args);
 };
 
 // Set up minimal test environment for backend tests

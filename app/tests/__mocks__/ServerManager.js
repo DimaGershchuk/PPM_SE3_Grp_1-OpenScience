@@ -1,12 +1,3 @@
-// Mock createjs first
-global.createjs = {
-    LoadQueue: jest.fn().mockImplementation(() => ({
-        addEventListener: jest.fn(),
-        loadFile: jest.fn(),
-        load: jest.fn()
-    }))
-};
-
 // Mock ServerManager
 class ServerManager {
     constructor(psychoJS) {
@@ -16,7 +7,7 @@ class ServerManager {
     }
 
     _setupPreloadQueue() {
-        // Use the mocked createjs
+        // Use the mocked createjs from setup.js
         this._preloadQueue = new createjs.LoadQueue(true, "", true);
     }
 
