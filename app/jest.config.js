@@ -6,11 +6,8 @@ module.exports = {
     },
     moduleFileExtensions: ['js', 'jsx', 'json'],
     testMatch: [
-        '<rootDir>/tests/Util/Scheduler.test.js',
-        '<rootDir>/tests/Util/PsychObject.test.js',
-        '<rootDir>/tests/Util/EventEmitter.test.js',
-        '<rootDir>/tests/core/EventManager.test.js',
-        '<rootDir>/tests/core/Logger.test.js'
+        '<rootDir>/tests/**/*.test.js',
+        '<rootDir>/tests/**/*.spec.js'
     ],
     testPathIgnorePatterns: [
         '<rootDir>/src/visual/',
@@ -20,18 +17,15 @@ module.exports = {
         '<rootDir>/src/interaction/',
         'node_modules'
     ],
-    moduleNameMapper: {
-        // Map core backend dependencies to mocks
-        '.*[/\\\\]src[/\\\\]core[/\\\\]ServerManager\\.js$': '<rootDir>/tests/__mocks__/ServerManager.js',
-        '.*[/\\\\]src[/\\\\]core[/\\\\]PsychoJS\\.js$': '<rootDir>/tests/__mocks__/PsychoJS.js'
-    },
     clearMocks: true,
     resetMocks: true,
     restoreMocks: true,
     rootDir: '.',
     verbose: true,
-    setupFiles: [
-        'jest-canvas-mock',
-        '<rootDir>/tests/setup.js'
-    ]
+    transformIgnorePatterns: [
+        'node_modules/(?!(createjs|pixi.js-legacy)/)'
+    ],
+    testEnvironmentOptions: {
+        url: 'http://localhost'
+    }
 }; 

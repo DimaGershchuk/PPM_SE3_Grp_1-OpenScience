@@ -1,13 +1,28 @@
-// Mock createjs (required by ServerManager)
+// Mock createjs (required by ServerManager) - MUST BE AT THE TOP
 global.createjs = {
     LoadQueue: jest.fn().mockImplementation(() => ({
-        addEventListener: jest.fn(),
-        loadFile: jest.fn(),
-        load: jest.fn(),
+        addEventListener: jest.fn().mockReturnThis(),
+        loadFile: jest.fn().mockReturnThis(),
+        load: jest.fn().mockReturnThis(),
         getResult: jest.fn(),
         getProgress: jest.fn(),
-        close: jest.fn()
-    }))
+        close: jest.fn().mockReturnThis(),
+        removeEventListener: jest.fn().mockReturnThis(),
+        removeAllEventListeners: jest.fn().mockReturnThis(),
+        on: jest.fn().mockReturnThis(),
+        off: jest.fn().mockReturnThis(),
+        dispatchEvent: jest.fn().mockReturnThis(),
+        hasEventListener: jest.fn()
+    })),
+    Sound: {
+        registerSound: jest.fn(),
+        play: jest.fn(),
+        stop: jest.fn(),
+        pause: jest.fn(),
+        resume: jest.fn(),
+        setVolume: jest.fn(),
+        getVolume: jest.fn()
+    }
 };
 
 // Set up minimal test environment
@@ -20,7 +35,10 @@ global.window = {
     innerHeight: 600,
     devicePixelRatio: 1,
     location: {
-        hostname: 'localhost'
+        hostname: 'localhost',
+        origin: 'http://localhost',
+        protocol: 'http:',
+        href: 'http://localhost'
     }
 };
 
@@ -37,35 +55,25 @@ global.document = {
     }
 };
 
-// Mock WebGL context
-global.WebGLRenderingContext = {
-    VERTEX_SHADER: 'VERTEX_SHADER',
-    FRAGMENT_SHADER: 'FRAGMENT_SHADER',
-    ARRAY_BUFFER: 'ARRAY_BUFFER',
-    ELEMENT_ARRAY_BUFFER: 'ELEMENT_ARRAY_BUFFER',
-    STATIC_DRAW: 'STATIC_DRAW'
-};
-
-// Suppress console warnings
+// Suppress specific console warnings
 const originalConsoleError = console.error;
 console.error = (...args) => {
-    if (typeof args[0] === 'string' && (
-        args[0].includes('WebGL not available') ||
-        args[0].includes('Tone.js')
-    )) {
+    const message = args.join(' ');
+    
+    // Only suppress specific WebGL errors from PIXI
+    if (message.includes('WebGL not available') && 
+        message.includes('CompressedTextureLoader')) {
         return;
     }
+    
+    // Only suppress specific Tone.js initialization message
+    if (message.includes('Tone.js') && 
+        message.includes('v14.7.77')) {
+        return;
+    }
+    
     originalConsoleError(...args);
 };
 
 // Mock PIXI
-jest.mock('pixi.js-legacy', () => ({}));
-
-// Set up minimal test environment for backend tests
-const setupTestEnvironment = () => {
-    global.window = {
-        addEventListener: jest.fn()
-    };
-};
-
-setupTestEnvironment(); 
+jest.mock('pixi.js-legacy', () => ({})); 
