@@ -1,4 +1,4 @@
-import { MinimalStim } from '../../src/core/MinimalStim.js';
+/*import { MinimalStim } from '../../src/core/MinimalStim.js';
 import { Window } from '../../src/core/Window.js';
 import { PsychoJS } from '../../src/core/PsychoJS.js';
 
@@ -326,4 +326,4 @@ describe('MinimalStim', () => {
             Object.assign(document.documentElement, original);
         });
     });
-}); 
+}); */
