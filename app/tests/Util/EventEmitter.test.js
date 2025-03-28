@@ -1,8 +1,8 @@
 // EventEmitter.test.js
-import { EventEmitter } from "../../src/util/EventEmitter.js";
+import { EventEmitter } from "../../../src/util/EventEmitter";;
 
 
-jest.mock("../../src/util/Util.js", () => {
+jest.mock("../../../src/util/Util.js", () => {
   let counter = 0;
   return {
     makeUuid: () => `uuid-${++counter}`
