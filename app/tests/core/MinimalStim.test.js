@@ -37,6 +37,7 @@ describe("MinimalStim", () => {
         NOT_STARTED: Symbol.for("NOT_STARTED"),
         STARTED: Symbol.for("STARTED"),
         STOPPED: Symbol.for("STOPPED"),
+        FINISHED: Symbol.for("FINISHED"),
       },
       experimentLogger: { data: jest.fn() }
     };
@@ -129,7 +130,7 @@ describe("MinimalStim", () => {
     // Window's removePixiObject should be called with _pixi.
     expect(dummyWin.removePixiObject).toHaveBeenCalledWith(stim._pixi);
     // Status should be set to STOPPED.
-    expect(stim.status).toBe(dummyPsychoJS.Status.STOPPED);
+    expect(stim.status).toBe(dummyPsychoJS.Status.FINISHED);
   });
 
   test("release() should set autoDraw to false, set status to STOPPED, and destroy _pixi", () => {
