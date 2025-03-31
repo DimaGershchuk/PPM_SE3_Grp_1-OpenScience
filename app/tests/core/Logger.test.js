@@ -37,8 +37,19 @@ describe('Logger', () => {
         logger = new Logger(psychoJS, log4javascript.Level.INFO);
         // Initialize logs array
         logger._serverLogs = [];
-        // Mock _getValue to always return a high value
-        logger._getValue = jest.fn().mockReturnValue(100);
+        // Mock _getValue to return actual level values
+        logger._getValue.mockImplementation((level) => {
+            const levelMap = {
+                [Logger.ServerLevel.DEBUG]: 10,
+                [Logger.ServerLevel.INFO]: 20,
+                [Logger.ServerLevel.EXP]: 22,
+                [Logger.ServerLevel.DATA]: 25,
+                [Logger.ServerLevel.WARNING]: 30,
+                [Logger.ServerLevel.ERROR]: 40,
+                [Logger.ServerLevel.CRITICAL]: 50
+            };
+            return levelMap[level] || 30;
+        });
     });
 
     afterEach(() => {
@@ -63,20 +74,6 @@ describe('Logger', () => {
     });
 
     it('should respect log level when logging', () => {
-        // Mock _getValue to return actual level values
-        logger._getValue.mockImplementation((level) => {
-            const levelMap = {
-                [Logger.ServerLevel.DEBUG]: 10,
-                [Logger.ServerLevel.INFO]: 20,
-                [Logger.ServerLevel.EXP]: 22,
-                [Logger.ServerLevel.DATA]: 25,
-                [Logger.ServerLevel.WARNING]: 30,
-                [Logger.ServerLevel.ERROR]: 40,
-                [Logger.ServerLevel.CRITICAL]: 50
-            };
-            return levelMap[level] || 30;
-        });
-
         // Set level to INFO (20)
         logger.setLevel(Logger.ServerLevel.INFO);
         // EXP (22) is higher than INFO (20), so this should be logged
@@ -89,4 +86,18 @@ describe('Logger', () => {
         logger.exp('another message');
         expect(logger._serverLogs.length).toBe(1); // Still 1, not 2
     });
-}); 
+
+    it('exp() and data() should respect log levels correctly', () => {
+        logger.setLevel(Logger.ServerLevel.DATA); // DATA = 25
+
+        // exp => level=EXP(22) < DATA(25) => should not be logged
+        logger.exp('Experiment msg');
+        expect(logger._serverLogs).toHaveLength(0);
+
+        // data => level=DATA(25) >= DATA(25) => should be logged
+        logger.data('Data msg');
+        expect(logger._serverLogs).toHaveLength(1);
+        expect(logger._serverLogs[0].msg).toBe('Data msg');
+        expect(logger._serverLogs[0].level).toBe(Logger.ServerLevel.DATA);
+    });
+});

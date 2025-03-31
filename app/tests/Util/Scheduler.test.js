@@ -1,4 +1,4 @@
-import { Scheduler } from "../../src/util/Scheduler.js";
+import { Scheduler } from "../../../src/util/Scheduler.js";
 
 class MockWindow {
   render = jest.fn();

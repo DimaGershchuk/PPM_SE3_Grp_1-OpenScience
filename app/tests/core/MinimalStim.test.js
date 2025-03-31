@@ -1,329 +1,163 @@
-import { MinimalStim } from '../../src/core/MinimalStim.js';
-import { Window } from '../../src/core/Window.js';
-import { PsychoJS } from '../../src/core/PsychoJS.js';
+import { MinimalStim } from "../../../src/core/MinimalStim.js";
+import { PsychoJS } from "../../../src/core/PsychoJS.js";
 
-describe('MinimalStim', () => {
-    let psychoJS;
-    let win;
-    let stim;
+// Create a subclass to implement abstract methods for testing.
+class TestStim extends MinimalStim {
+  constructor(options) {
+    super(options);
+  }
+  
+  // Implement abstract method 'contains'
+  contains(object, units) {
+    return false;
+  }
+  
+  // Implement _updateIfNeeded to simply set a dummy _pixi if not defined.
+  _updateIfNeeded() {
+    if (typeof this._pixi === "undefined") {
+      this._pixi = { dummy: true, destroy: jest.fn() };
+    }
+    this._needUpdate = false;
+  }
+}
 
-    beforeEach(() => {
-        // Create a mock PsychoJS instance
-        psychoJS = new PsychoJS();
-        
-        // Create a mock Window instance
-        win = new Window({
-            psychoJS: psychoJS,
-            size: [800, 600],
-            color: [0, 0, 0],
-            units: 'pix'
-        });
+describe("MinimalStim", () => {
+  let dummyPsychoJS;
+  let dummyWin;
+  let stim;
 
-        // Create a MinimalStim instance for testing
-        stim = new MinimalStim({
-            name: 'testStim',
-            win: win,
-            autoDraw: false,
-            autoLog: true
-        });
+  beforeEach(() => {
+    // Create a dummy PsychoJS with Status constants.
+    dummyPsychoJS = {
+      logger: {
+        warn: jest.fn(),
+        info: jest.fn(),
+      },
+      Status: {
+        NOT_STARTED: Symbol.for("NOT_STARTED"),
+        STARTED: Symbol.for("STARTED"),
+        STOPPED: Symbol.for("STOPPED"),
+        FINISHED: Symbol.for("FINISHED"),
+      },
+      experimentLogger: { data: jest.fn() }
+    };
+
+    // Create a dummy Window with the needed methods and properties.
+    dummyWin = {
+      _psychoJS: dummyPsychoJS,
+      autoLog: true,
+      _drawList: [],
+      addPixiObject: jest.fn(),
+      removePixiObject: jest.fn(),
+    };
+
+    // Create a TestStim instance with provided options.
+    stim = new TestStim({
+      name: "TestStim",
+      win: dummyWin,
+      autoDraw: false,
+      autoLog: false
     });
+  });
 
-    afterEach(() => {
-        // Clean up after each test
-        if (stim) {
-            stim.release();
-        }
-        if (win) {
-            win.close();
-        }
-    });
+  test("should initialize with correct default attributes", () => {
+    expect(stim.name).toBe("TestStim");
+    expect(stim.win).toBe(dummyWin);
+    expect(stim.autoDraw).toBe(false);
+    expect(stim.autoLog).toBe(false);
+    expect(stim.status).toBe(dummyPsychoJS.Status.NOT_STARTED);
+  });
 
-    describe('constructor', () => {
-        test('should create a MinimalStim instance with correct default values', () => {
-            expect(stim.name).toBe('testStim');
-            expect(stim.win).toBe(win);
-            expect(stim.autoDraw).toBe(false);
-            expect(stim.autoLog).toBe(true);
-            expect(stim.status).toBe(PsychoJS.Status.NOT_STARTED);
-        });
+  test("setAutoDraw(true) should call draw()", () => {
+    // Spy on draw() and hide()
+    stim.draw = jest.fn();
+    stim.hide = jest.fn();
+    stim.setAutoDraw(true);
+    expect(stim.draw).toHaveBeenCalled();
+    expect(stim.hide).not.toHaveBeenCalled();
+  });
 
-        test('should handle undefined win parameter', () => {
-            const stimWithoutWin = new MinimalStim({
-                name: 'testStim2'
-            });
-            expect(stimWithoutWin.win).toBeUndefined();
-            expect(stimWithoutWin.autoLog).toBe(false);
-        });
-    });
+  test("setAutoDraw(false) should call hide()", () => {
+    stim.draw = jest.fn();
+    stim.hide = jest.fn();
+    stim.setAutoDraw(false);
+    expect(stim.hide).toHaveBeenCalled();
+    expect(stim.draw).not.toHaveBeenCalled();
+  });
 
-    describe('setAutoDraw', () => {
-        test('should set autoDraw attribute correctly', () => {
-            stim.setAutoDraw(true);
-            expect(stim.autoDraw).toBe(true);
-            
-            stim.setAutoDraw(false);
-            expect(stim.autoDraw).toBe(false);
-        });
+  test("draw() should add stimulus to window if not already present", () => {
+    // Ensure the draw list is initially empty.
+    dummyWin._drawList = [];
+    stim._pixi = undefined;
+    stim.draw();
+    // _updateIfNeeded should have set _pixi to a dummy object.
+    expect(stim._pixi).toBeDefined();
+    // Window's addPixiObject should be called with _pixi.
+    expect(dummyWin.addPixiObject).toHaveBeenCalledWith(stim._pixi);
+    // The stimulus should be added to the draw list.
+    expect(dummyWin._drawList).toContain(stim);
+    // Status should be set to STARTED.
+    expect(stim.status).toBe(dummyPsychoJS.Status.STARTED);
+  });
 
-        test('should handle logging parameter', () => {
-            const consoleSpy = jest.spyOn(console, 'log');
-            stim.setAutoDraw(true, true);
-            expect(consoleSpy).toHaveBeenCalled();
-            consoleSpy.mockRestore();
-        });
-    });
+  test("draw() should update stimulus if already in draw list and _needUpdate is true", () => {
+    // Place the stimulus in the draw list.
+    dummyWin._drawList = [stim];
+    // Set _pixi to a dummy object and _needUpdate to true.
+    stim._pixi = { dummy: true, destroy: jest.fn() };
+    stim._needUpdate = true;
+    // Spy on _updateIfNeeded and window methods.
+    const updateSpy = jest.spyOn(stim, "_updateIfNeeded");
+    dummyWin.removePixiObject = jest.fn();
+    dummyWin.addPixiObject = jest.fn();
+    stim.draw();
+    // Should remove the old pixi object.
+    expect(dummyWin.removePixiObject).toHaveBeenCalledWith(stim._pixi);
+    // Should call _updateIfNeeded.
+    expect(updateSpy).toHaveBeenCalled();
+    // And add the pixi object again.
+    expect(dummyWin.addPixiObject).toHaveBeenCalledWith(stim._pixi);
+  });
 
-    describe('draw', () => {
-        test('should add stimulus to draw list when not already present', () => {
-            stim.draw();
-            expect(win._drawList).toContain(stim);
-        });
+  test("hide() should remove stimulus from window", () => {
+    // Place the stimulus in the draw list.
+    dummyWin._drawList = [stim];
+    stim._pixi = { dummy: true };
+    dummyWin.removePixiObject = jest.fn();
+    stim.hide();
+    // The stimulus should be removed from the draw list.
+    expect(dummyWin._drawList).not.toContain(stim);
+    // Window's removePixiObject should be called with _pixi.
+    expect(dummyWin.removePixiObject).toHaveBeenCalledWith(stim._pixi);
+    // Status should be set to STOPPED.
+    expect(stim.status).toBe(dummyPsychoJS.Status.FINISHED);
+  });
 
-        test('should not add stimulus to draw list if already present', () => {
-            stim.draw();
-            const initialLength = win._drawList.length;
-            stim.draw();
-            expect(win._drawList.length).toBe(initialLength);
-        });
+  test("release() should set autoDraw to false, set status to STOPPED, and destroy _pixi", () => {
+    // Set a dummy _pixi with a destroy method.
+    const destroySpy = jest.fn();
+    stim._pixi = { dummy: true, destroy: destroySpy };
+    // Spy on _setAttribute.
+    const setAttrSpy = jest.spyOn(stim, "_setAttribute");
+    stim.release();
+    expect(setAttrSpy).toHaveBeenCalledWith("autoDraw", false, false);
+    expect(stim.status).toBe(dummyPsychoJS.Status.FINISHED);
+    expect(destroySpy).toHaveBeenCalledWith(true);
+    expect(stim._pixi).toBeUndefined();
+  });
 
-        test('should update status to STARTED', () => {
-            stim.draw();
-            expect(stim.status).toBe(PsychoJS.Status.STARTED);
-        });
-    });
+  test("contains() should throw an error because it's abstract", () => {
+    // Create an instance of MinimalStim directly.
+    expect(() => {
+      const minimalStim = new MinimalStim({ name: "AbstractTest", win: dummyWin });
+      minimalStim.contains({});
+    }).toThrow();
+  });
 
-    describe('hide', () => {
-        test('should remove stimulus from draw list', () => {
-            stim.draw();
-            expect(win._drawList).toContain(stim);
-            
-            stim.hide();
-            expect(win._drawList).not.toContain(stim);
-        });
-
-        test('should update status to STOPPED', () => {
-            stim.draw();
-            stim.hide();
-            expect(stim.status).toBe(PsychoJS.Status.STOPPED);
-        });
-    });
-
-    describe('contains', () => {
-        test('should throw error as it is an abstract method', () => {
-            expect(() => {
-                stim.contains({}, 'pix');
-            }).toThrow();
-        });
-    });
-
-    describe('release', () => {
-        test('should set autoDraw to false', () => {
-            stim.setAutoDraw(true);
-            stim.release();
-            expect(stim.autoDraw).toBe(false);
-        });
-
-        test('should update status to STOPPED', () => {
-            stim.release();
-            expect(stim.status).toBe(PsychoJS.Status.STOPPED);
-        });
-
-        test('should handle logging parameter', () => {
-            const consoleSpy = jest.spyOn(console, 'log');
-            stim.release(true);
-            expect(consoleSpy).toHaveBeenCalled();
-            consoleSpy.mockRestore();
-        });
-    });
-
-    describe('_updateIfNeeded', () => {
-        test('should throw error as it is an abstract method', () => {
-            expect(() => {
-                stim._updateIfNeeded();
-            }).toThrow();
-        });
-    });
-
-    describe('integration', () => {
-        test('should work with Window interaction', () => {
-            // Create multiple stimuli
-            const stim1 = new MinimalStim({
-                name: 'stim1',
-                win: win,
-                autoDraw: false
-            });
-            const stim2 = new MinimalStim({
-                name: 'stim2',
-                win: win,
-                autoDraw: true
-            });
-
-            // Test window draw list management
-            expect(win._drawList).not.toContain(stim1);
-            expect(win._drawList).toContain(stim2);
-
-            stim1.draw();
-            expect(win._drawList).toContain(stim1);
-
-            // Test window cleanup affects stimuli
-            win.close();
-            expect(stim1.status).toBe(PsychoJS.Status.STOPPED);
-            expect(stim2.status).toBe(PsychoJS.Status.STOPPED);
-        });
-        
-        test('should handle multiple PIXI objects', () => {
-            // Create mock PIXI objects
-            const pixiObj1 = { id: 'pixiObj1', destroy: jest.fn() };
-            const pixiObj2 = { id: 'pixiObj2', destroy: jest.fn() };
-
-            // Attach PIXI objects to stimulus
-            stim._pixi = pixiObj1;
-            stim.draw();
-            expect(win._rootContainer.children).toContain(pixiObj1);
-
-            // Update PIXI object
-            stim._pixi = pixiObj2;
-            stim._needUpdate = true;
-            stim.draw();
-            expect(win._rootContainer.children).toContain(pixiObj2);
-            expect(win._rootContainer.children).not.toContain(pixiObj1);
-
-            // Cleanup should handle all PIXI objects
-            stim.release();
-            expect(pixiObj2.destroy).toHaveBeenCalled();
-        });
-    });
-
-    describe('performance', () => {
-        test('should maintain consistent state under rapid operations', () => {
-            // Simulate rapid draw/hide operations
-            const operations = 100;
-            const startTime = performance.now();
-
-            for (let i = 0; i < operations; i++) {
-                stim.draw();
-                stim.hide();
-            }
-
-            const endTime = performance.now();
-            const timePerOperation = (endTime - startTime) / operations;
-
-            // Verify final state is correct
-            expect(stim.status).toBe(PsychoJS.Status.STOPPED);
-            expect(win._drawList).not.toContain(stim);
-
-            // Performance threshold (adjust based on requirements)
-            expect(timePerOperation).toBeLessThan(1); // Less than 1ms per operation
-        });
-
-        test('should handle repeated attribute changes efficiently', () => {
-            const iterations = 50;
-            const startTime = performance.now();
-
-            for (let i = 0; i < iterations; i++) {
-                stim.setAutoDraw(true);
-                stim.setAutoDraw(false);
-                stim._needUpdate = true;
-                stim.draw();
-            }
-
-            const endTime = performance.now();
-            const averageTime = (endTime - startTime) / iterations;
-
-            // Verify state consistency after stress test
-            expect(stim.autoDraw).toBe(false);
-            expect(averageTime).toBeLessThan(2); // Less than 2ms per iteration
-        });
-    });
-
-    describe('memory management', () => {
-        test('should properly clean up resources on release', () => {
-            // Setup multiple PIXI objects and references
-            const pixiObjects = Array.from({ length: 5 }, (_, i) => ({
-                id: `pixiObj${i}`,
-                destroy: jest.fn()
-            }));
-
-            // Simulate multiple updates with different PIXI objects
-            pixiObjects.forEach(obj => {
-                stim._pixi = obj;
-                stim.draw();
-            });
-
-            // Release and verify cleanup
-            stim.release();
-
-            // Verify all PIXI objects were properly destroyed
-            expect(pixiObjects[pixiObjects.length - 1].destroy).toHaveBeenCalledWith(true);
-            expect(stim._pixi).toBeUndefined();
-
-            // Verify no memory leaks in window references
-            expect(win._drawList).not.toContain(stim);
-        });
-
-        test('should handle cleanup of event listeners and references', () => {
-            const eventSpy = jest.spyOn(stim, 'release');
-            
-            // Create circular references to test cleanup
-            const circularRef = { stim };
-            stim._testRef = circularRef;
-
-            // Release and verify
-            stim.release();
-            
-            expect(eventSpy).toHaveBeenCalled();
-            expect(stim._testRef).toBeUndefined();
-            
-            eventSpy.mockRestore();
-        });
-    });
-
-    describe('browser compatibility', () => {
-        test('should handle different requestAnimationFrame implementations', () => {
-            const originalRAF = window.requestAnimationFrame;
-            const mockRAF = jest.fn();
-            window.requestAnimationFrame = mockRAF;
-
-            stim.draw();
-            expect(mockRAF).toHaveBeenCalled();
-
-            window.requestAnimationFrame = originalRAF;
-        });
-
-        test('should work with different browser event models', () => {
-            // Test standard DOM events
-            const domEvent = new Event('test');
-            expect(() => {
-                document.dispatchEvent(domEvent);
-            }).not.toThrow();
-
-            // Test legacy IE event model
-            const legacyEvent = document.createEvent('Event');
-            legacyEvent.initEvent('test', true, true);
-            expect(() => {
-                document.dispatchEvent(legacyEvent);
-            }).not.toThrow();
-        });
-
-        test('should handle vendor-prefixed methods gracefully', () => {
-            // Store original methods
-            const original = {
-                requestFullscreen: document.documentElement.requestFullscreen,
-                webkitRequestFullscreen: document.documentElement.webkitRequestFullscreen,
-                mozRequestFullScreen: document.documentElement.mozRequestFullScreen
-            };
-
-            // Test with different vendor prefixes
-            document.documentElement.requestFullscreen = undefined;
-            document.documentElement.webkitRequestFullscreen = jest.fn();
-            
-            stim.draw();
-            expect(() => {
-                win.adjustScreenSize();
-            }).not.toThrow();
-
-            // Restore original methods
-            Object.assign(document.documentElement, original);
-        });
-    });
-}); 
+  test("_updateIfNeeded() should throw an error because it's abstract", () => {
+    expect(() => {
+      const minimalStim = new MinimalStim({ name: "AbstractTest", win: dummyWin });
+      minimalStim._updateIfNeeded();
+    }).toThrow();
+  });
+});

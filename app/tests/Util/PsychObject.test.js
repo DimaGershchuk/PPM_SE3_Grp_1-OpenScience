@@ -1,6 +1,6 @@
 // PsychObject.test.js
 
-import { PsychObject } from "../../src/util/PsychObject.js";
+import { PsychObject } from "../../../src/util/PsychObject";
 
 // Mock logger
 class MockLogger {
