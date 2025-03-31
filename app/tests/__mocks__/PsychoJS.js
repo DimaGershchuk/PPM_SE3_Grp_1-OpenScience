@@ -1,68 +1,93 @@
-const ServerManager = require('./ServerManager');
+import { PsychObject } from '../../src/util/PsychObject.js';
+import { MonotonicClock } from '../../src/util/Clock.js';
 
-class PsychoJS {
+// Simple ServerManager mock
+class ServerManager extends PsychObject {
+    constructor({ psychoJS }) {
+        super(psychoJS);
+        this._psychoJS = psychoJS;
+    }
+
+    log(msg, level, obj) {
+        console[level.toLowerCase()](msg, obj);
+    }
+}
+
+export class PsychoJS extends PsychObject {
     constructor({
         debug = false,
         collectIP = false,
-        hosts = [],
+        topLevelStatus = true
     } = {}) {
+        super();
+
         this._debug = debug;
-        this._hosts = hosts;
         this._collectIP = collectIP;
-        this._serverManager = new ServerManager(this);
-        this._serverMsg = [];
-        
-        this.status = 'INITIALIZED';
-        this.config = {
+        this._topLevelStatus = topLevelStatus;
+
+        // setup the logger:
+        this.logger = null;
+
+        // setup the server manager with minimal mock:
+        this._serverManager = {
+            log: (msg, level, obj) => {
+                console[level.toLowerCase()](msg, obj);
+            }
+        };
+
+        // setup the experiment handler:
+        this._experiment = null;
+
+        // setup the window:
+        this._window = null;
+
+        // setup the scheduler:
+        this._scheduler = null;
+
+        // setup the clock:
+        this.clock = new MonotonicClock();
+
+        // setup the status:
+        this._status = 'CREATED';
+
+        // setup the config:
+        this._config = {
+            environment: 'TEST',
             experiment: {
-                name: 'testExp',
-                fullpath: '/tests/testExp',
-                status: 'RUNNING'
+                name: 'test',
+                fullpath: 'test',
+                saveFormat: 'CSV',
+                saveIncompleteResults: true,
+                license: 'GPL',
+                runMode: 'TEST'
+            },
+            session: {
+                status: 'OPEN'
             }
         };
     }
 
-    get serverManager() {
-        return this._serverManager;
-    }
-
     getEnvironment() {
-        return 'TEST';
+        return this._config.environment;
     }
 
     experimentEnded() {
-        return false;
+        this._status = 'ENDED';
     }
 
-    log(msg) {
-        this._serverMsg.push({ level: 'INFO', msg });
-        this._serverManager.log({ level: 'INFO', msg });
-        return this;
+    quit() {
+        this._status = 'QUIT';
     }
 
-    debug(msg) {
-        this._serverMsg.push({ level: 'DEBUG', msg });
-        this._serverManager.debug(msg);
-        return this;
+    static get Status() {
+        return {
+            CREATED: Symbol.for('CREATED'),
+            STARTED: Symbol.for('STARTED'),
+            PAUSED: Symbol.for('PAUSED'),
+            STOPPED: Symbol.for('STOPPED'),
+            FINISHED: Symbol.for('FINISHED'),
+            ERROR: Symbol.for('ERROR'),
+            QUIT: Symbol.for('QUIT')
+        };
     }
-
-    info(msg) {
-        this._serverMsg.push({ level: 'INFO', msg });
-        this._serverManager.info(msg);
-        return this;
-    }
-
-    warn(msg) {
-        this._serverMsg.push({ level: 'WARNING', msg });
-        this._serverManager.warn(msg);
-        return this;
-    }
-
-    error(msg) {
-        this._serverMsg.push({ level: 'ERROR', msg });
-        this._serverManager.error(msg);
-        return this;
-    }
-}
-
-module.exports = PsychoJS; 
+} 
