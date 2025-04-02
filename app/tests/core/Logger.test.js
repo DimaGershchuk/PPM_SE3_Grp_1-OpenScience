@@ -1,4 +1,4 @@
-import { Logger } from '../../src/core/Logger.js';
+import { Logger } from '../../../src/core/Logger.js';
 import { PsychoJS } from '../__mocks__/PsychoJS.js';
 import log4javascript from 'log4javascript';
 
@@ -35,18 +35,21 @@ describe('Logger', () => {
         psychoJS = new PsychoJS();
         // Create a new Logger instance for each test
         logger = new Logger(psychoJS, log4javascript.Level.INFO);
+
+        logger.setLevel(Logger.ServerLevel.DEBUG);
+        
         // Initialize logs array
         logger._serverLogs = [];
         // Mock _getValue to return actual level values
-        logger._getValue.mockImplementation((level) => {
+        jest.spyOn(logger, '_getValue').mockImplementation((level) => {
             const levelMap = {
-                [Logger.ServerLevel.DEBUG]: 10,
-                [Logger.ServerLevel.INFO]: 20,
-                [Logger.ServerLevel.EXP]: 22,
-                [Logger.ServerLevel.DATA]: 25,
-                [Logger.ServerLevel.WARNING]: 30,
-                [Logger.ServerLevel.ERROR]: 40,
-                [Logger.ServerLevel.CRITICAL]: 50
+              [Logger.ServerLevel.DEBUG]: 10,
+              [Logger.ServerLevel.INFO]: 20,
+              [Logger.ServerLevel.EXP]: 22,
+              [Logger.ServerLevel.DATA]: 25,
+              [Logger.ServerLevel.WARNING]: 30,
+              [Logger.ServerLevel.ERROR]: 40,
+              [Logger.ServerLevel.CRITICAL]: 50
             };
             return levelMap[level] || 30;
         });
