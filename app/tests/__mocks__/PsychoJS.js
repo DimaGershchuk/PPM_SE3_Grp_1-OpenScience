@@ -1,5 +1,5 @@
-import { PsychObject } from '../../src/util/PsychObject.js';
-import { MonotonicClock } from '../../src/util/Clock.js';
+import { PsychObject } from '../../../src/util/PsychObject.js';
+import { MonotonicClock } from '../../../src/util/Clock.js';
 
 // Simple ServerManager mock
 class ServerManager extends PsychObject {
