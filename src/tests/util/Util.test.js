@@ -1,4 +1,5 @@
-import { range } from '../../util/Util.js';
+import { range, isEmpty } from '../../util/Util.js';
+
 
 
 
@@ -26,5 +27,31 @@ describe('range()', () => {
   test('throws error if arguments are not integers', () => {
     expect(() => range(1.5, 5)).toThrow();
     expect(() => range(0, '5')).toThrow();
+  });
+});
+
+
+
+
+describe('isEmpty()', () => {
+  test('returns true for undefined', () => {
+    expect(isEmpty(undefined)).toBe(true);
+  });
+
+  test('returns true for empty array', () => {
+    expect(isEmpty([])).toBe(true);
+  });
+
+  test('returns true for [undefined]', () => {
+    expect(isEmpty([undefined])).toBe(true);
+  });
+
+  test('returns false for non-empty array', () => {
+    expect(isEmpty([1, 2, 3])).toBe(false);
+  });
+
+  test('returns false for non-array object', () => {
+    expect(isEmpty(42)).toBe(false);
+    expect(isEmpty('hello')).toBe(false);
   });
 });
