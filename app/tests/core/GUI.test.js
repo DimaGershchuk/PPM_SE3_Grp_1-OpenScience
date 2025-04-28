@@ -5,8 +5,8 @@ jest.mock('tone', () => ({
     start: jest.fn()
   }));
   
-  import { GUI } from '../../core/GUI';
-  import { PsychoJS } from '../../core/PsychoJS';
+  import { GUI } from '../../../src/core/GUI';
+  import { PsychoJS } from '../../../src/core/PsychoJS';
   
   describe('GUI Class', () => {
     let psychoJS;
